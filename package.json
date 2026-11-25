@@ -2,7 +2,7 @@
   "name": "pulau-apung-sd",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "node test-e2e.js"
