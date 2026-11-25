@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Layar Siswa - Pulau Apung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/audio.js"></script>
+</head>
+<body style="background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);">
+  <div class="water-waves"></div>
+
+  <div class="mobile-wrapper">
+    <!-- ================= 1. JOIN SCREEN ================= -->
+    <div id="student-screen-join" style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
+      <div style="background: rgba(255, 255, 255, 0.98); border-radius: 28px; padding: 28px 22px; box-shadow: 0 16px 36px rgba(0,0,0,0.25); border: 4px solid #bae6fd; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 4px;">🏝️</div>
+        <h2 style="font-size: 1.8rem; font-weight: 900; color: #0284c7; margin-bottom: 2px;">
+          PULAU APUNG
+        </h2>
+        <p style="color: #64748b; font-size: 0.95rem; font-weight: 700; margin-bottom: 20px;">
+          Masukkan PIN dari layar proyektor:
+        </p>
+
+        <!-- Room Code Input -->
+        <div style="margin-bottom: 14px; text-align: left;">
+          <label style="font-size: 0.85rem; font-weight: 800; color: #475569;">KODE PIN ROOM:</label>
+          <input id="input-room-code" type="text" placeholder="Contoh: 1234" maxlength="6" style="width: 100%; padding: 12px; font-size: 1.6rem; text-align: center; font-weight: 900; letter-spacing: 4px; border-radius: 14px; border: 2.5px solid #0284c7; outline: none; margin-top: 4px; text-transform: uppercase;">
+        </div>
+
+        <!-- Student Name Input -->
+        <div style="margin-bottom: 16px; text-align: left;">
+          <label style="font-size: 0.85rem; font-weight: 800; color: #475569;">NAMA PANGGILAN:</label>
+          <input id="input-student-name" type="text" placeholder="Nama kamu (misal: Budi)" maxlength="12" style="width: 100%; padding: 12px; font-size: 1.15rem; font-weight: 800; border-radius: 14px; border: 2.5px solid #cbd5e1; outline: none; margin-top: 4px;">
+        </div>
+
+        <!-- Avatar Picker -->
+        <div style="text-align: left; margin-bottom: 20px;">
+          <label style="font-size: 0.85rem; font-weight: 800; color: #475569;">PILIH KARAKTER HEWAN:</label>
+          <div class="avatar-grid" id="avatar-grid-container">
+            <div class="avatar-choice active" data-avatar="🐰">🐰</div>
+            <div class="avatar-choice" data-avatar="🐱">🐱</div>
+            <div class="avatar-choice" data-avatar="🐶">🐶</div>
+            <div class="avatar-choice" data-avatar="🦁">🦁</div>
+            <div class="avatar-choice" data-avatar="🐼">🐼</div>
+            <div class="avatar-choice" data-avatar="🦊">🦊</div>
+            <div class="avatar-choice" data-avatar="🐸">🐸</div>
+            <div class="avatar-choice" data-avatar="🐵">🐵</div>
+            <div class="avatar-choice" data-avatar="🐧">🐧</div>
+            <div class="avatar-choice" data-avatar="🐨">🐨</div>
+          </div>
+        </div>
+
+        <button id="btn-join-room" class="btn-fun btn-green" style="width: 100%; font-size: 1.25rem; padding: 14px;">
+          GABUNG MAIN SEKARANG! 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 2. WAITING LOBBY SCREEN ================= -->
+    <div id="student-screen-waiting" style="display: none; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+      <div style="background: rgba(255, 255, 255, 0.98); border-radius: 28px; padding: 32px 24px; box-shadow: 0 16px 36px rgba(0,0,0,0.25); border: 4px solid #bae6fd; max-width: 380px; width: 100%;">
+        <div id="wait-avatar" style="font-size: 4.5rem; margin-bottom: 12px; animation: floatTitle 2s ease-in-out infinite;">
+          🐰
+        </div>
+        <h3 id="wait-name" style="font-size: 1.8rem; font-weight: 900; color: #0284c7; margin-bottom: 4px;">
+          Halo, Budi!
+        </h3>
+        <div style="background: #e0f2fe; color: #0369a1; padding: 6px 14px; border-radius: 9999px; font-weight: 800; font-size: 0.9rem; display: inline-block; margin-bottom: 20px;">
+          Terkoneksi ke Room <span id="wait-room-code">1234</span>
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #475569; line-height: 1.5;">
+          👀 Perhatikan layar proyektor di depan kelas ya... Game akan segera dimulai oleh Guru!
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 3. ACTIVE QUESTION CONTROLLER SCREEN ================= -->
+    <div id="student-screen-question" style="display: none; flex-direction: column; flex: 1;">
+      <!-- Player Header Status -->
+      <div class="player-status-bar">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="q-player-avatar" style="font-size: 1.6rem;">🐰</span>
+          <span id="q-player-name" style="color: #0f172a; font-size: 1.1rem;">Budi</span>
+        </div>
+        <div style="color: #d97706; font-size: 1.1rem;">
+          ⭐ <span id="q-player-score">0</span>
+        </div>
+      </div>
+
+      <!-- Quick Instruction Banner -->
+      <div style="background: rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 10px 16px; text-align: center; margin-bottom: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <div style="font-weight: 800; font-size: 1rem; color: #0369a1;">
+          Pilih Pulau yang Benar & Aman:
+        </div>
+        <div id="selected-choice-notice" style="font-weight: 800; font-size: 0.9rem; color: #64748b; margin-top: 2px;">
+          Sentuh salah satu warna pulau di bawah!
+        </div>
+      </div>
+
+      <!-- 4 Huge Colored Island Touch Buttons -->
+      <div class="student-buttons-grid">
+        <!-- Pulau Merah (A) -->
+        <button id="btn-island-A" class="island-btn island-btn-a" data-island="A">
+          <div class="island-btn-icon">🌋</div>
+          <div class="island-btn-label">PULAU MERAH (A)</div>
+          <div id="btn-text-A" class="island-btn-desc">Pilihan A</div>
+        </button>
+
+        <!-- Pulau Biru (B) -->
+        <button id="btn-island-B" class="island-btn island-btn-b" data-island="B">
+          <div class="island-btn-icon">🌊</div>
+          <div class="island-btn-label">PULAU BIRU (B)</div>
+          <div id="btn-text-B" class="island-btn-desc">Pilihan B</div>
+        </button>
+
+        <!-- Pulau Kuning (C) -->
+        <button id="btn-island-C" class="island-btn island-btn-c" data-island="C">
+          <div class="island-btn-icon">🏖️</div>
+          <div class="island-btn-label">PULAU KUNING (C)</div>
+          <div id="btn-text-C" class="island-btn-desc">Pilihan C</div>
+        </button>
+
+        <!-- Pulau Hijau (D) -->
+        <button id="btn-island-D" class="island-btn island-btn-d" data-island="D">
+          <div class="island-btn-icon">🌴</div>
+          <div class="island-btn-label">PULAU HIJAU (D)</div>
+          <div id="btn-text-D" class="island-btn-desc">Pilihan D</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 4. ROUND RESULT SCREEN ================= -->
+    <div id="student-screen-result" style="display: none; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+      <div id="result-box" style="background: rgba(255, 255, 255, 0.98); border-radius: 28px; padding: 32px 24px; box-shadow: 0 16px 36px rgba(0,0,0,0.25); max-width: 380px; width: 100%;">
+        <div id="res-icon" style="font-size: 4.5rem; margin-bottom: 8px;">
+          ⭐
+        </div>
+        <h3 id="res-title" style="font-size: 1.8rem; font-weight: 900; margin-bottom: 4px;">
+          HORE! SELAMAT!
+        </h3>
+        <div id="res-points-badge" style="font-size: 1.25rem; font-weight: 900; color: #d97706; margin-bottom: 14px;">
+          +100 Bintang!
+        </div>
+        <div id="res-explanation" style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px; font-weight: 700; color: #334155; font-size: 0.95rem; margin-bottom: 16px;">
+          Jawaban benar adalah Pulau Hijau!
+        </div>
+        <p style="color: #64748b; font-size: 0.95rem; font-weight: 700;">
+          Lihat animasi serunya di layar proyektor! Tunggu soal selanjutnya...
+        </p>
+      </div>
+    </div>
+
+    <!-- ================= 5. FINAL PODIUM SCREEN ================= -->
+    <div id="student-screen-podium" style="display: none; flex-direction: column; justify-content: center; align-items: center; flex: 1; text-align: center;">
+      <div style="background: rgba(255, 255, 255, 0.98); border-radius: 28px; padding: 32px 24px; box-shadow: 0 16px 36px rgba(0,0,0,0.25); max-width: 380px; width: 100%; border: 4px solid #fde047;">
+        <div style="font-size: 4.5rem; margin-bottom: 8px;">🏆</div>
+        <h3 style="font-size: 1.8rem; font-weight: 900; color: #b45309; margin-bottom: 4px;">
+          PERMAINAN SELESAI!
+        </h3>
+        <div style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">
+          Hebat sekali, <span id="podium-my-name">Budi</span>!
+        </div>
+        <div style="background: #fef3c7; border: 2px solid #facc15; border-radius: 18px; padding: 16px; margin-bottom: 20px;">
+          <div style="font-size: 0.9rem; font-weight: 800; color: #b45309;">TOTAL BINTANGMU:</div>
+          <div id="podium-my-stars" style="font-size: 2.4rem; font-weight: 900; color: #d97706;">
+            ⭐ 0
+          </div>
+          <div id="podium-my-rank" style="font-size: 1.1rem; font-weight: 800; color: #475569; margin-top: 4px;">
+            Peringkat #1 di kelas!
+          </div>
+        </div>
+        <p style="color: #64748b; font-size: 0.95rem; font-weight: 700;">
+          Terima kasih sudah belajar & bermain bersama di Pulau Apung!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/play.js"></script>
+</body>
+</html>

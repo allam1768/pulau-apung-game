@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layar Proyektor Guru - Pulau Apung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=12">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/questions.js?v=12"></script>
+  <script src="/js/audio.js?v=12"></script>
+</head>
+<body class="host-layout">
+  <div class="water-waves"></div>
+
+  <!-- Top Bar -->
+  <header class="host-topbar">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span style="font-size: 1.8rem;">🏝️</span>
+      <div class="room-badge">
+        <span style="color: #64748b; font-size: 0.9rem;">KODE PIN:</span>
+        <span class="room-pin" id="room-pin-display">----</span>
+      </div>
+    </div>
+
+    <!-- Timer Box (shown during question) -->
+    <div id="timer-container" class="timer-box" style="display: none;">
+      ⏱️ <span id="timer-seconds">15</span>s
+    </div>
+
+    <!-- Controls -->
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button id="btn-sound-toggle" class="btn-fun btn-white" style="padding: 8px 16px; font-size: 0.95rem;">
+        🔊 Suara: AKTIF
+      </button>
+      <button id="btn-manage-questions" class="btn-fun btn-yellow" style="padding: 8px 16px; font-size: 0.95rem;">
+        ⚙️ Kelola Soal Guru
+      </button>
+      <!-- Quick Start Button in Topbar (Always visible & clickable!) -->
+      <button id="btn-topbar-start" class="btn-fun btn-green" style="padding: 8px 20px; font-size: 1rem;">
+        🚀 MULAI PERMAINAN
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= LOBBY SCREEN ================= -->
+  <main id="screen-lobby" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 14px 20px; overflow-y: auto; max-height: calc(100vh - 75px); z-index: 10;">
+    <div style="background: rgba(255, 255, 255, 0.98); border-radius: 28px; padding: 20px 28px; box-shadow: 0 16px 40px rgba(0,0,0,0.3); max-width: 820px; width: 100%; text-align: center; border: 4px solid #bae6fd; margin-bottom: 24px;">
+      <h2 style="font-size: 1.8rem; font-weight: 900; color: #0284c7; margin-bottom: 2px;">
+        Ayo Masuk ke Pulau Apung! 🏝️
+      </h2>
+      <p style="color: #64748b; font-size: 0.95rem; font-weight: 700; margin-bottom: 14px;">
+        Scan QR Code di bawah pakai kamera HP atau buka link di browser:
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 24px; margin-bottom: 16px;">
+        <!-- QR Code -->
+        <div style="background: white; padding: 10px; border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); border: 2px dashed #0284c7;">
+          <img id="qr-code-img" src="" alt="QR Code Room" style="width: 150px; height: 150px; display: block; border-radius: 10px;">
+        </div>
+
+        <!-- Connection Instructions -->
+        <div style="text-align: left; max-width: 380px;">
+          <div style="font-size: 0.85rem; font-weight: 800; color: #64748b;">CARA GABUNG:</div>
+          <div style="font-size: 1rem; font-weight: 800; color: #0f172a; margin: 4px 0;">
+            1. Buka link ini di browser HP/Tablet:
+          </div>
+          <div id="join-url-box" style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.9rem; word-break: break-all;">
+            Memuat link...
+          </div>
+          <div style="font-size: 1rem; font-weight: 800; color: #0f172a; margin: 8px 0 2px 0;">
+            2. Masukkan PIN:
+          </div>
+          <div id="lobby-pin-huge" style="font-size: 2.2rem; font-weight: 900; color: #0284c7; letter-spacing: 4px;">
+            ----
+          </div>
+        </div>
+      </div>
+
+      <!-- Packet Selector & Direct Start Row -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; background: #f8fafc; padding: 10px 16px; border-radius: 16px; border: 1.5px solid #e2e8f0;">
+        <span style="font-weight: 800; color: #334155; font-size: 0.95rem;">Materi:</span>
+        <select id="select-pack" style="padding: 8px 14px; border-radius: 9999px; font-weight: 800; font-size: 0.95rem; border: 2.5px solid #0284c7; background: #ffffff; color: #0f172a; outline: none; cursor: pointer;">
+          <option value="matematika">🔢 Matematika Ceria (SD 1–3)</option>
+          <option value="bahasa">📚 Bahasa Indonesia & Kosakata (SD 1–3)</option>
+          <option value="ipas">🌿 IPAS / Alam Cilik (SD 1–3)</option>
+        </select>
+        <span id="question-count-badge" style="background: #fef3c7; color: #b45309; padding: 5px 12px; border-radius: 9999px; font-weight: 800; font-size: 0.85rem;">
+          5 Soal
+        </span>
+        <button id="btn-add-demo-bot" class="btn-fun btn-white" style="padding: 6px 14px; font-size: 0.85rem; border: 2px solid #0284c7; color: #0284c7;">
+          🤖 +Siswa Demo
+        </button>
+      </div>
+
+      <!-- MAIN BIG START BUTTON (Right in the center, impossible to miss!) -->
+      <div style="margin-bottom: 16px;">
+        <button id="btn-start-game" class="btn-fun btn-green" style="font-size: 1.35rem; padding: 14px 40px; width: 100%; max-width: 480px; box-shadow: 0 8px 24px rgba(5, 150, 105, 0.4);">
+          🚀 MULAI PERJALANAN KE PULAU APUNG!
+        </button>
+      </div>
+
+      <!-- Preview 4 Pulau Apung -->
+      <div style="background: #f0fdf4; border: 2px dashed #86efac; border-radius: 16px; padding: 10px 14px; margin-bottom: 14px;">
+        <div style="font-weight: 800; color: #166534; font-size: 0.85rem; margin-bottom: 6px;">
+          🗺️ 4 PULAU APUNG DI SAMUDRA (ARENA KUIS):
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-weight: 800; font-size: 0.8rem;">
+          <div style="background: #fee2e2; color: #991b1b; padding: 6px; border-radius: 10px; border: 1.5px solid #f87171;">
+            🌋 🔴 Karang (A)
+          </div>
+          <div style="background: #dbeafe; color: #1e40af; padding: 6px; border-radius: 10px; border: 1.5px solid #60a5fa;">
+            🌊 🔵 Samudra (B)
+          </div>
+          <div style="background: #fef3c7; color: #92400e; padding: 6px; border-radius: 10px; border: 1.5px solid #fbbf24;">
+            🏖️ 🟡 Pasir (C)
+          </div>
+          <div style="background: #dcfce7; color: #166534; padding: 6px; border-radius: 10px; border: 1.5px solid #4ade80;">
+            🌴 🟢 Rimba (D)
+          </div>
+        </div>
+      </div>
+
+      <!-- Joined Players Roster -->
+      <div style="border-top: 2px dashed #cbd5e1; padding-top: 12px;">
+        <div style="font-size: 0.95rem; font-weight: 800; color: #334155; margin-bottom: 8px;">
+          Siswa yang Sudah Berkumpul di Dermaga: (<span id="player-count">0</span> Siswa)
+        </div>
+        <div id="lobby-players-list" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-height: 100px; overflow-y: auto; padding: 8px; background: #f8fafc; border-radius: 12px;">
+          <span style="color: #94a3b8; font-style: italic; font-size: 0.9rem;">Menunggu siswa scan QR atau klik tombol demo di atas...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= GAMEPLAY ARENA SCREEN ================= -->
+  <main id="screen-game" style="flex: 1; display: none; flex-direction: column; position: relative; z-index: 5;">
+    <!-- Question Banner -->
+    <div class="question-banner">
+      <div id="q-category" class="question-category">KATEGORI MATEMATIKA</div>
+      <div id="q-text" class="question-text">
+        Ada 3 apel 🍎🍎🍎 ditambah 2 apel 🍎🍎. Berapa jumlah semua apel?
+      </div>
+    </div>
+
+    <!-- Center Deck (Bridge for avatars before moving) -->
+    <div id="center-bridge" class="center-deck">
+      <div class="center-deck-title">Dermaga Titik Kumpul ⚓</div>
+      <div id="bridge-occupants" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; min-height: 36px;">
+        <!-- Avatars start here -->
+      </div>
+    </div>
+
+    <!-- 4 Real Organic Floating Islands Arena (No Rectangular Cards / No Emojis) -->
+    <div class="islands-arena">
+      <!-- 1. PULAU MERAH (A) - Gunung Api & Karang Vulkanik -->
+      <div id="island-A" class="real-island-unit island-red">
+        <svg class="island-map-svg" viewBox="0 0 500 320" preserveAspectRatio="none">
+          <defs>
+            <radialGradient id="grad-lava-core" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff176"/>
+              <stop offset="45%" stop-color="#ff7043"/>
+              <stop offset="100%" stop-color="#d32f2f"/>
+            </radialGradient>
+            <linearGradient id="grad-volcano-land" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f43f5e"/>
+              <stop offset="45%" stop-color="#be123c"/>
+              <stop offset="85%" stop-color="#881337"/>
+              <stop offset="100%" stop-color="#4c0519"/>
+            </linearGradient>
+            <linearGradient id="grad-mountain-slope" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#4c0519"/>
+              <stop offset="50%" stop-color="#881337"/>
+              <stop offset="100%" stop-color="#2a040d"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Water Foam Ripple around Beach -->
+          <path d="M 40,165 C 25,65 170,25 310,30 C 445,35 480,105 465,195 C 445,270 340,305 210,295 C 90,285 45,235 40,165 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="7" stroke-dasharray="14,8"/>
+          <!-- Submerged 3D Cliff Rock Base -->
+          <path d="M 45,175 C 45,250 115,295 220,300 C 350,305 455,275 450,195 C 455,255 350,310 220,310 C 100,310 40,255 45,175 Z" fill="#2a040d"/>
+          <!-- Sandy Beach Coastline (Natural Organic Curves) -->
+          <path d="M 48,160 C 35,75 175,35 305,40 C 435,45 470,110 455,190 C 435,260 335,290 215,285 C 100,275 52,225 48,160 Z" fill="#fecdd3" stroke="#fca5a5" stroke-width="4"/>
+          <!-- Plateau Volcanic Landmass -->
+          <path d="M 62,150 C 50,85 180,50 295,55 C 415,60 445,115 435,180 C 418,245 325,270 215,265 C 110,260 65,210 62,150 Z" fill="url(#grad-volcano-land)"/>
+
+          <!-- Drawn Volcano Mountain Cone & Glowing Crater -->
+          <polygon points="330,175 395,75 460,175" fill="url(#grad-mountain-slope)"/>
+          <polygon points="340,170 395,85 450,170" fill="#be123c"/>
+          <ellipse cx="395" cy="80" rx="22" ry="8" fill="url(#grad-lava-core)"/>
+          <!-- Lava River flow down slope -->
+          <path d="M 395,85 Q 405,120 415,160" stroke="#ff7043" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M 392,85 Q 385,115 375,150" stroke="#ffa726" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+          <!-- Basalt Rocks on Beach -->
+          <ellipse cx="85" cy="190" rx="18" ry="11" fill="#4c0519"/>
+          <ellipse cx="115" cy="205" rx="14" ry="9" fill="#881337"/>
+          <ellipse cx="98" cy="180" rx="10" ry="7" fill="#be123c"/>
+        </svg>
+
+        <!-- Island Surface Content (Wooden Signboard & Beach Clearing) -->
+        <div class="island-surface-ui">
+          <div class="wooden-signboard board-red">
+            <div class="signboard-title">PULAU MERAH (A)</div>
+            <div id="answer-A" class="signboard-answer">Pilihan A</div>
+          </div>
+          <div id="occupants-A" class="island-beach-zone"></div>
+        </div>
+
+        <!-- Real Deep-Sea Sinking & Flood Layer -->
+        <div class="sea-submersion-layer">
+          <div class="submerged-banner">TENGGELAM KE DASAR LAUT</div>
+          <div class="submerged-bubbles">
+            <div class="bubble-ring b1"></div>
+            <div class="bubble-ring b2"></div>
+            <div class="bubble-ring b3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PULAU BIRU (B) - Laguna Samudra & Menara Mercusuar -->
+      <div id="island-B" class="real-island-unit island-blue">
+        <svg class="island-map-svg" viewBox="0 0 500 320" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="grad-ocean-land" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="45%" stop-color="#0284c7"/>
+              <stop offset="85%" stop-color="#075985"/>
+              <stop offset="100%" stop-color="#082f49"/>
+            </linearGradient>
+            <radialGradient id="grad-cove-lagoon" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#e0f2fe"/>
+              <stop offset="45%" stop-color="#7dd3fc"/>
+              <stop offset="100%" stop-color="#0284c7"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Water Foam Ripple around Beach -->
+          <path d="M 45,150 C 30,55 190,20 340,25 C 470,30 485,110 465,200 C 440,270 320,305 185,295 C 75,285 45,225 45,150 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="7" stroke-dasharray="14,8"/>
+          <!-- Submerged 3D Cliff Rock Base -->
+          <path d="M 50,160 C 50,245 110,295 210,300 C 330,305 445,270 440,195 C 445,255 330,310 200,310 C 95,310 45,250 50,160 Z" fill="#082f49"/>
+          <!-- Sandy Beach Coastline -->
+          <path d="M 55,145 C 40,65 190,30 330,35 C 455,40 470,115 450,190 C 430,260 315,290 190,285 C 85,275 52,215 55,145 Z" fill="#bae6fd" stroke="#7dd3fc" stroke-width="4"/>
+          <!-- Plateau Landmass -->
+          <path d="M 70,135 C 55,75 190,45 320,50 C 435,55 450,120 430,180 C 410,245 305,270 190,265 C 95,260 65,200 70,135 Z" fill="url(#grad-ocean-land)"/>
+
+          <!-- Drawn Inner Clear Blue Lagoon Pool -->
+          <ellipse cx="140" cy="180" rx="55" ry="30" fill="url(#grad-cove-lagoon)" stroke="#ffffff" stroke-width="3"/>
+
+          <!-- Drawn Lighthouse Tower (Red & White Striped) -->
+          <polygon points="380,185 390,75 415,75 425,185" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+          <!-- Red Stripes -->
+          <polygon points="383,160 387,135 418,135 422,160" fill="#ef4444"/>
+          <polygon points="388,110 392,85 413,85 417,110" fill="#ef4444"/>
+          <!-- Lighthouse Roof Dome & Beacon Light -->
+          <rect x="388" y="65" width="28" height="12" rx="2" fill="#334155"/>
+          <ellipse cx="402" cy="65" rx="14" ry="10" fill="#ef4444"/>
+          <circle cx="402" cy="71" r="5" fill="#fef08a"/>
+          <!-- Light Beams -->
+          <polygon points="402,71 475,30 485,90" fill="rgba(254, 240, 138, 0.45)"/>
+        </svg>
+
+        <div class="island-surface-ui">
+          <div class="wooden-signboard board-blue">
+            <div class="signboard-title">PULAU BIRU (B)</div>
+            <div id="answer-B" class="signboard-answer">Pilihan B</div>
+          </div>
+          <div id="occupants-B" class="island-beach-zone"></div>
+        </div>
+
+        <div class="sea-submersion-layer">
+          <div class="submerged-banner">TENGGELAM KE DASAR LAUT</div>
+          <div class="submerged-bubbles">
+            <div class="bubble-ring b1"></div>
+            <div class="bubble-ring b2"></div>
+            <div class="bubble-ring b3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PULAU KUNING (C) - Teluk Pasir Emas & Pohon Kelapa Tropis -->
+      <div id="island-C" class="real-island-unit island-yellow">
+        <svg class="island-map-svg" viewBox="0 0 500 320" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="grad-sand-dune" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="35%" stop-color="#fde047"/>
+              <stop offset="70%" stop-color="#d97706"/>
+              <stop offset="100%" stop-color="#78350f"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Water Foam Ripple around Beach -->
+          <path d="M 40,150 C 35,50 190,20 340,25 C 465,30 480,120 460,205 C 435,275 320,305 190,295 C 80,285 40,225 40,150 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="7" stroke-dasharray="14,8"/>
+          <!-- Submerged 3D Cliff Rock Base -->
+          <path d="M 45,160 C 45,245 105,295 205,300 C 330,305 440,270 435,195 C 440,255 330,310 200,310 C 95,310 40,250 45,160 Z" fill="#451a03"/>
+          <!-- Sandy Beach Coastline -->
+          <path d="M 50,145 C 40,60 190,30 330,35 C 450,40 465,120 445,195 C 425,265 310,290 190,285 C 85,275 48,215 50,145 Z" fill="#fef08a" stroke="#fde047" stroke-width="4"/>
+          <!-- Sand Dune Plateau -->
+          <path d="M 65,135 C 55,70 190,45 320,50 C 430,55 445,125 425,185 C 405,250 300,270 190,265 C 95,260 60,200 65,135 Z" fill="url(#grad-sand-dune)"/>
+
+          <!-- Drawn Coconut Palm Trees (Left Coast) -->
+          <!-- Trunk 1 -->
+          <path d="M 105,205 Q 120,135 90,85" stroke="#78350f" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M 105,205 Q 120,135 90,85" stroke="#a16207" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <!-- Palm Fronds (Leaves) -->
+          <path d="M 90,85 Q 55,60 40,85" stroke="#15803d" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M 90,85 Q 65,40 65,25" stroke="#16a34a" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M 90,85 Q 110,40 125,45" stroke="#22c55e" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M 90,85 Q 130,70 135,100" stroke="#15803d" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <!-- Coconuts -->
+          <circle cx="86" cy="92" r="5" fill="#451a03"/>
+          <circle cx="95" cy="94" r="5" fill="#451a03"/>
+          <circle cx="91" cy="98" r="4.5" fill="#582506"/>
+
+          <!-- Drawn Pirate Treasure Chest (Right Coast) -->
+          <rect x="375" y="155" width="45" height="28" rx="4" fill="#78350f" stroke="#ca8a04" stroke-width="3"/>
+          <path d="M 373,155 Q 397,140 422,155 Z" fill="#92400e" stroke="#ca8a04" stroke-width="2.5"/>
+          <circle cx="397" cy="168" r="4" fill="#facc15"/>
+          <rect x="395" y="168" width="4" height="7" fill="#facc15"/>
+          <!-- Gold Coins Piled beside chest -->
+          <circle cx="365" cy="180" r="5" fill="#facc15" stroke="#ca8a04"/>
+          <circle cx="372" cy="182" r="4" fill="#fde047" stroke="#ca8a04"/>
+        </svg>
+
+        <div class="island-surface-ui">
+          <div class="wooden-signboard board-yellow">
+            <div class="signboard-title">PULAU KUNING (C)</div>
+            <div id="answer-C" class="signboard-answer">Pilihan C</div>
+          </div>
+          <div id="occupants-C" class="island-beach-zone"></div>
+        </div>
+
+        <div class="sea-submersion-layer">
+          <div class="submerged-banner">TENGGELAM KE DASAR LAUT</div>
+          <div class="submerged-bubbles">
+            <div class="bubble-ring b1"></div>
+            <div class="bubble-ring b2"></div>
+            <div class="bubble-ring b3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. PULAU HIJAU (D) - Hutan Rimba Tropis Lebat -->
+      <div id="island-D" class="real-island-unit island-green">
+        <svg class="island-map-svg" viewBox="0 0 500 320" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="grad-jungle-land" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4ade80"/>
+              <stop offset="45%" stop-color="#16a34a"/>
+              <stop offset="85%" stop-color="#14532d"/>
+              <stop offset="100%" stop-color="#052e16"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Water Foam Ripple around Beach -->
+          <path d="M 40,140 C 30,45 190,15 340,20 C 470,25 485,115 465,200 C 440,270 320,305 190,295 C 80,285 40,220 40,140 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="7" stroke-dasharray="14,8"/>
+          <!-- Submerged 3D Cliff Rock Base -->
+          <path d="M 45,150 C 45,245 105,295 205,300 C 330,305 440,270 435,195 C 440,255 330,310 200,310 C 95,310 40,250 45,150 Z" fill="#052e16"/>
+          <!-- Sandy Beach Coastline -->
+          <path d="M 50,135 C 40,55 190,25 330,30 C 450,35 465,115 445,190 C 425,260 310,290 190,285 C 85,275 48,210 50,135 Z" fill="#bbf7d0" stroke="#86efac" stroke-width="4"/>
+          <!-- Jungle Plateau Landmass -->
+          <path d="M 65,125 C 55,65 190,40 320,45 C 430,50 445,120 425,180 C 405,245 300,270 190,265 C 95,260 60,195 65,125 Z" fill="url(#grad-jungle-land)"/>
+
+          <!-- Drawn Rainforest Jungle Trees (Multi-cluster treetops) -->
+          <!-- Right Cluster -->
+          <circle cx="390" cy="110" r="32" fill="#15803d"/>
+          <circle cx="420" cy="130" r="28" fill="#166534"/>
+          <circle cx="380" cy="140" r="24" fill="#14532d"/>
+          <circle cx="405" cy="100" r="20" fill="#22c55e"/>
+
+          <!-- Left Cluster -->
+          <circle cx="95" cy="110" r="28" fill="#166534"/>
+          <circle cx="75" cy="130" r="22" fill="#15803d"/>
+          <circle cx="110" cy="135" r="20" fill="#14532d"/>
+          <circle cx="90" cy="95" r="16" fill="#22c55e"/>
+
+          <!-- Jungle Flowers & Vines -->
+          <circle cx="130" cy="190" r="6" fill="#f43f5e"/>
+          <circle cx="145" cy="205" r="5" fill="#facc15"/>
+          <circle cx="360" cy="190" r="6" fill="#38bdf8"/>
+        </svg>
+
+        <div class="island-surface-ui">
+          <div class="wooden-signboard board-green">
+            <div class="signboard-title">PULAU HIJAU (D)</div>
+            <div id="answer-D" class="signboard-answer">Pilihan D</div>
+          </div>
+          <div id="occupants-D" class="island-beach-zone"></div>
+        </div>
+
+        <div class="sea-submersion-layer">
+          <div class="submerged-banner">TENGGELAM KE DASAR LAUT</div>
+          <div class="submerged-bubbles">
+            <div class="bubble-ring b1"></div>
+            <div class="bubble-ring b2"></div>
+            <div class="bubble-ring b3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Host Controls (Reveal / Next) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 28px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 20;">
+      <div style="color: white; font-weight: 800; font-size: 1.1rem;">
+        Soal <span id="q-current-index">1</span> dari <span id="q-total-count">5</span>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button id="btn-reveal-now" class="btn-fun btn-yellow" style="display: inline-flex;">
+          ⭐ Ungkap Jawaban Sekarang
+        </button>
+        <button id="btn-next-question" class="btn-fun btn-green" style="display: none;">
+          Soal Berikutnya ➡️
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= PODIUM / GAME OVER SCREEN ================= -->
+  <main id="screen-podium" style="flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; z-index: 10;">
+    <div style="background: rgba(255, 255, 255, 0.98); border-radius: 32px; padding: 36px 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-width: 840px; width: 100%; text-align: center; border: 5px solid #fef08a;">
+      <h2 style="font-size: 2.6rem; font-weight: 900; color: #b45309; margin-bottom: 4px;">
+        🏆 PODIUM JUARA PULAU APUNG 🏆
+      </h2>
+      <p style="color: #64748b; font-size: 1.1rem; font-weight: 700; margin-bottom: 28px;">
+        Hore! Seluruh petualang hebat telah menyelesaikan semua tantangan!
+      </p>
+
+      <!-- Top 3 Podium Visual -->
+      <div id="podium-boxes" style="display: flex; align-items: flex-end; justify-content: center; gap: 16px; margin-bottom: 32px; min-height: 220px;">
+        <!-- Filled dynamically -->
+      </div>
+
+      <!-- Complete Leaderboard -->
+      <div style="border-top: 2px dashed #cbd5e1; padding-top: 20px; margin-bottom: 24px; max-height: 180px; overflow-y: auto;">
+        <div style="font-weight: 800; color: #334155; margin-bottom: 8px;">Daftar Peringkat Semua Siswa:</div>
+        <div id="full-leaderboard-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
+      <button id="btn-play-again" class="btn-fun btn-green" style="font-size: 1.3rem; padding: 14px 42px;">
+        🔄 Main Lagi / Ganti Soal
+      </button>
+    </div>
+  </main>
+
+  <!-- ================= MODAL: KELOLA SOAL GURU ================= -->
+  <div id="modal-questions" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.5rem; font-weight: 900; color: #0284c7;">
+          ⚙️ Kelola Soal Guru (SD Kelas 1–3)
+        </h3>
+        <button id="btn-close-modal" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #64748b;">✕</button>
+      </div>
+
+      <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 16px;">
+        Bapak/Ibu Guru dapat memilih paket kurikulum yang sudah ada atau menambahkan soal sendiri secara fleksibel!
+      </p>
+
+      <!-- Form Tambah Soal -->
+      <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 18px; padding: 16px; margin-bottom: 20px;">
+        <div style="font-weight: 800; color: #0f172a; margin-bottom: 10px;">➕ Tambah Soal Baru:</div>
+        
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">Pertanyaan / Soal:</label>
+          <input id="input-q-text" type="text" placeholder="Contoh: Berapa hasil 4 + 4 = ... ?" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-weight: 700; margin-top: 4px;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 700; color: #dc2626;">🔴 Pilihan A:</label>
+            <input id="input-opt-a" type="text" placeholder="Jawaban A" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-weight: 700; margin-top: 4px;">
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 700; color: #2563eb;">🔵 Pilihan B:</label>
+            <input id="input-opt-b" type="text" placeholder="Jawaban B" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-weight: 700; margin-top: 4px;">
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 700; color: #d97706;">🟡 Pilihan C:</label>
+            <input id="input-opt-c" type="text" placeholder="Jawaban C" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-weight: 700; margin-top: 4px;">
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 700; color: #059669;">🟢 Pilihan D:</label>
+            <input id="input-opt-d" type="text" placeholder="Jawaban D" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-weight: 700; margin-top: 4px;">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">Kunci Jawaban Benar:</label>
+            <select id="input-q-correct" style="padding: 6px 12px; border-radius: 8px; font-weight: 800; border: 1.5px solid #cbd5e1; margin-top: 4px; display: block;">
+              <option value="A">🔴 Pilihan A</option>
+              <option value="B">🔵 Pilihan B</option>
+              <option value="C">🟡 Pilihan C</option>
+              <option value="D">🟢 Pilihan D</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">Durasi (Detik):</label>
+            <input id="input-q-duration" type="number" value="15" min="5" max="60" style="padding: 6px 12px; border-radius: 8px; font-weight: 800; border: 1.5px solid #cbd5e1; margin-top: 4px; width: 80px; display: block;">
+          </div>
+        </div>
+
+        <button id="btn-save-custom-question" class="btn-fun btn-blue" style="width: 100%; padding: 10px; font-size: 1rem;">
+          💾 Simpan & Tambahkan ke Paket Soal
+        </button>
+      </div>
+
+      <!-- Preview Daftar Soal Saat Ini -->
+      <div style="font-weight: 800; color: #0f172a; margin-bottom: 8px;">Daftar Soal Aktif:</div>
+      <div id="modal-questions-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+    </div>
+  </div>
+
+  <script src="/js/host.js?v=12"></script>
+</body>
+</html>

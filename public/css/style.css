@@ -1,0 +1,1004 @@
+/* =========================================================
+   PULAU APUNG: JANGAN JATUH! - HIGH POLISH CARTOON THEME
+   Style: 3D Tropical Arcade / Nintendo Switch Vibe for SD 1-3
+========================================================= */
+
+:root {
+  --color-red: #f43f5e;
+  --color-red-dark: #be123c;
+  --color-blue: #0ea5e9;
+  --color-blue-dark: #0369a1;
+  --color-yellow: #f59e0b;
+  --color-yellow-dark: #b45309;
+  --color-green: #10b981;
+  --color-green-dark: #047857;
+  
+  --ocean-surface: #38bdf8;
+  --ocean-mid: #0284c7;
+  --ocean-deep: #0369a1;
+  --ocean-abyss: #082f49;
+  
+  --sand-light: #fef08a;
+  --sand-mid: #fcd34d;
+  --cliff-rock: #78350f;
+  --cliff-deep: #451a03;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: 'Fredoka', 'Quicksand', 'Nunito', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at 50% 20%, #7dd3fc 0%, #38bdf8 35%, #0284c7 70%, #0369a1 100%);
+  color: #0f172a;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ================= AMBIENT OCEAN & FOAM WAVES ================= */
+.water-waves {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(ellipse at 20% 40%, rgba(255, 255, 255, 0.25) 0%, transparent 20%),
+    radial-gradient(ellipse at 80% 60%, rgba(255, 255, 255, 0.2) 0%, transparent 25%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 12%, transparent 14%);
+  background-size: 100% 100%, 100% 100%, 75px 75px;
+  animation: seaSwell 12s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+@keyframes seaSwell {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.02) translateY(-6px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* Floating Sea Creatures Ambient */
+body::before {
+  content: '🐬';
+  position: fixed;
+  bottom: 30px;
+  left: 60px;
+  font-size: 2.4rem;
+  opacity: 0.4;
+  animation: swimDolphin 18s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes swimDolphin {
+  0% { transform: translateX(-100px) translateY(0) rotate(10deg); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateX(calc(100vw + 100px)) translateY(-40px) rotate(-10deg); opacity: 0; }
+}
+
+/* ================= 3D ARCADE BUTTONS ================= */
+.btn-fun {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.15rem;
+  padding: 14px 28px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-decoration: none;
+  position: relative;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-fun:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.06);
+}
+
+.btn-fun:active {
+  transform: translateY(4px) scale(0.98);
+}
+
+.btn-green {
+  background: linear-gradient(180deg, #34d399 0%, #10b981 40%, #059669 100%);
+  color: white;
+  box-shadow: 0 6px 0 #047857, 0 12px 20px rgba(5, 150, 105, 0.4);
+  border-top: 2px solid rgba(255, 255, 255, 0.4);
+}
+.btn-green:active { box-shadow: 0 2px 0 #047857, 0 4px 8px rgba(5, 150, 105, 0.3); }
+
+.btn-yellow {
+  background: linear-gradient(180deg, #fde047 0%, #f59e0b 50%, #d97706 100%);
+  color: #78350f;
+  box-shadow: 0 6px 0 #b45309, 0 12px 20px rgba(217, 119, 6, 0.4);
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  text-shadow: none;
+}
+.btn-yellow:active { box-shadow: 0 2px 0 #b45309, 0 4px 8px rgba(217, 119, 6, 0.3); }
+
+.btn-blue {
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+  color: white;
+  box-shadow: 0 6px 0 #1e40af, 0 12px 20px rgba(29, 78, 216, 0.4);
+  border-top: 2px solid rgba(255, 255, 255, 0.4);
+}
+.btn-blue:active { box-shadow: 0 2px 0 #1e40af, 0 4px 8px rgba(29, 78, 216, 0.3); }
+
+.btn-white {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  color: #0f172a;
+  box-shadow: 0 6px 0 #cbd5e1, 0 10px 18px rgba(0, 0, 0, 0.12);
+  border-top: 2px solid #ffffff;
+  text-shadow: none;
+}
+.btn-white:active { box-shadow: 0 2px 0 #cbd5e1; }
+
+/* ================= LANDING PORTAL PAGE ================= */
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px 20px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.game-logo {
+  font-size: 3.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 
+    0 4px 0 #0284c7,
+    0 8px 0 #0369a1,
+    0 12px 25px rgba(0, 0, 0, 0.4);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  animation: floatTitle 4s ease-in-out infinite;
+}
+
+.game-subtitle {
+  font-size: 1.3rem;
+  color: #f0fdf4;
+  font-weight: 800;
+  margin-bottom: 36px;
+  background: rgba(15, 23, 42, 0.35);
+  padding: 10px 28px;
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.role-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
+  gap: 28px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.role-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 36px;
+  padding: 36px 28px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.25),
+    0 0 0 5px #e0f2fe;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.role-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 10px;
+  background: linear-gradient(90deg, #38bdf8, #34d399, #facc15, #f87171);
+}
+
+.role-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.role-icon {
+  font-size: 4.5rem;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+}
+
+.role-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #0369a1;
+  margin-bottom: 10px;
+}
+
+.role-desc {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 28px;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+/* Host Layout & Scrollbar Support */
+.host-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+#screen-lobby {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 20px;
+  overflow-y: auto !important;
+  max-height: calc(100vh - 70px);
+  z-index: 10;
+}
+
+#screen-lobby::-webkit-scrollbar {
+  width: 10px;
+}
+#screen-lobby::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.15);
+  border-radius: 9999px;
+}
+#screen-lobby::-webkit-scrollbar-thumb {
+  background: #0284c7;
+  border-radius: 9999px;
+  border: 2px solid #e0f2fe;
+}
+
+/* Glassmorphism Top Bar */
+.host-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  color: white;
+  z-index: 30;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.room-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 8px 22px;
+  border-radius: 9999px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  border: 2px solid #38bdf8;
+}
+
+.room-pin {
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: #0284c7;
+  font-weight: 900;
+}
+
+.timer-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(180deg, #fef08a 0%, #f59e0b 100%);
+  color: #78350f;
+  padding: 6px 24px;
+  border-radius: 9999px;
+  border: 4px solid #ffffff;
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
+}
+
+.timer-box.hurry {
+  background: linear-gradient(180deg, #fca5a5 0%, #ef4444 100%);
+  color: white;
+  border-color: #fee2e2;
+  animation: pulseHurry 0.5s infinite alternate;
+}
+
+/* Signboard Question Banner */
+.question-banner {
+  background: #ffffff;
+  margin: 12px 32px 6px 32px;
+  padding: 16px 32px;
+  border-radius: 24px;
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.25),
+    0 0 0 6px #bae6fd;
+  text-align: center;
+  z-index: 20;
+  position: relative;
+}
+
+.question-banner::before {
+  content: '🪵 SOAL KUIS 🪵';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #78350f;
+  color: #fef3c7;
+  font-size: 0.85rem;
+  font-weight: 900;
+  padding: 4px 16px;
+  border-radius: 9999px;
+  letter-spacing: 1.5px;
+  border: 2px solid #d97706;
+}
+
+.question-text {
+  font-size: 1.95rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+.question-category {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #0284c7;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* ================= 3D TROPICAL FLOATING ISLANDS ARENA ================= */
+.islands-arena {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 20px;
+  padding: 10px 28px 16px 28px;
+  position: relative;
+  z-index: 10;
+}
+
+/* 100% PURE REAL ISLAND DIORAMA (NO RECTANGULAR CARDS / NO HULLS) */
+.real-island-unit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible;
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1s ease, filter 1s ease;
+  cursor: default;
+}
+
+/* Scalable Organic Island Map Topography */
+.island-map-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 20px 28px rgba(2, 25, 60, 0.55));
+  transition: filter 0.8s ease;
+}
+
+/* Content on Island Surface (Mounted Wooden Signboard & Beach Clearing) */
+.island-surface-ui {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+/* Floating Natural Bobbing Animation on Water Waves */
+#island-A { animation: bobIslandA 4.2s ease-in-out infinite; }
+#island-B { animation: bobIslandB 4.6s ease-in-out infinite; }
+#island-C { animation: bobIslandC 3.9s ease-in-out infinite; }
+#island-D { animation: bobIslandD 4.4s ease-in-out infinite; }
+
+@keyframes bobIslandA {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(-1deg); }
+}
+@keyframes bobIslandB {
+  0%, 100% { transform: translateY(-7px) rotate(0.8deg); }
+  50% { transform: translateY(5px) rotate(0deg); }
+}
+@keyframes bobIslandC {
+  0%, 100% { transform: translateY(5px) rotate(-0.5deg); }
+  50% { transform: translateY(-7px) rotate(0.7deg); }
+}
+@keyframes bobIslandD {
+  0%, 100% { transform: translateY(-8px) rotate(0.5deg); }
+  50% { transform: translateY(3px) rotate(-0.8deg); }
+}
+
+/* Carved Wooden Signpost Mounted into the Island Ground */
+.wooden-signboard {
+  background: repeating-linear-gradient(
+    180deg,
+    #78350f,
+    #78350f 12px,
+    #582506 12px,
+    #582506 15px
+  );
+  border: 3.5px solid #d97706;
+  border-radius: 16px;
+  padding: 6px 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 0 0 2px #451a03;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: auto;
+  max-width: 270px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 8;
+  text-align: center;
+}
+
+/* Realistic Wooden Signpost Post Stakes */
+.wooden-signboard::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 16px;
+  background: #582506;
+  border: 2px solid #78350f;
+  border-radius: 0 0 4px 4px;
+  z-index: -1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.signboard-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #fef3c7;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.board-red .signboard-title { color: #fecdd3; }
+.board-blue .signboard-title { color: #bae6fd; }
+.board-yellow .signboard-title { color: #fef08a; }
+.board-green .signboard-title { color: #bbf7d0; }
+
+.signboard-answer {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.85);
+  line-height: 1.25;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 4px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.5px;
+}
+
+/* Sandy Beach Landing Area where Avatars Gather (Natural Open Clearing) */
+.island-beach-zone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: flex-end;
+  justify-content: center;
+  min-height: 60px;
+  margin-top: auto;
+  background: transparent !important;
+  padding: 4px 8px;
+  border: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ================= TRUE DEEP-SEA SINKING ANIMATION ================= */
+.real-island-unit.sinking {
+  animation: realIslandPlunge 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none;
+}
+
+@keyframes realIslandPlunge {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    filter: none;
+  }
+  12% {
+    transform: translateY(-10px) rotate(3deg) scale(1.02); /* violent pre-sink shake */
+  }
+  24% {
+    transform: translateY(14px) rotate(-4deg) scale(0.98);
+  }
+  45% {
+    transform: translateY(80px) rotate(2deg) scale(0.9);
+    opacity: 0.95;
+  }
+  75% {
+    transform: translateY(150px) rotate(-1deg) scale(0.78);
+    opacity: 0.5;
+  }
+  100% {
+    /* Submerged deep beneath the ocean floor */
+    transform: translateY(210px) rotate(0deg) scale(0.65);
+    opacity: 0.15;
+    filter: blur(5px) brightness(0.2) saturate(2.5);
+  }
+}
+
+/* Water Inundation & Wave Surge Layer */
+.sea-submersion-layer {
+  position: absolute;
+  top: -10px; left: -10px; right: -10px; bottom: -10px;
+  background: radial-gradient(ellipse at center, rgba(14, 165, 233, 0.9) 0%, rgba(2, 132, 199, 0.96) 65%, rgba(8, 47, 73, 0.98) 100%);
+  border-radius: 50px;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 25;
+  transition: opacity 0.5s ease;
+  border: 4px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 50px rgba(14, 165, 233, 0.7);
+}
+
+.real-island-unit.sinking .sea-submersion-layer {
+  opacity: 1;
+  animation: waterSurgeMotion 2s infinite alternate;
+}
+
+@keyframes waterSurgeMotion {
+  0% { transform: scale(0.98); }
+  100% { transform: scale(1.02); }
+}
+
+.submerged-banner {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+  background: rgba(8, 47, 73, 0.85);
+  padding: 8px 24px;
+  border-radius: 9999px;
+  border: 2px solid #38bdf8;
+  letter-spacing: 1.5px;
+}
+
+/* Real Animated Bubble Rings Rising Through Water */
+.submerged-bubbles {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.bubble-ring {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(56, 189, 248, 0.2));
+  animation: bubbleRisingUp 1.4s infinite ease-in;
+}
+
+.bubble-ring.b1 { animation-delay: 0s; width: 28px; height: 28px; }
+.bubble-ring.b2 { animation-delay: 0.45s; width: 20px; height: 20px; }
+.bubble-ring.b3 { animation-delay: 0.9s; width: 32px; height: 32px; }
+
+@keyframes bubbleRisingUp {
+  0% { transform: translateY(35px) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-55px) scale(1.2); opacity: 0; }
+}
+
+/* SURVIVOR ISLAND GLOW & TRIUMPH */
+.real-island-unit.survivor {
+  animation: survivorFloat 1.6s infinite alternate !important;
+  z-index: 20;
+}
+
+@keyframes survivorFloat {
+  0% { transform: translateY(-8px) scale(1.03); }
+  100% { transform: translateY(-16px) scale(1.07); }
+}
+
+.real-island-unit.survivor .island-map-svg {
+  filter: drop-shadow(0 0 35px #fef08a) drop-shadow(0 0 65px rgba(250, 204, 21, 0.65)) drop-shadow(0 20px 25px rgba(0, 0, 0, 0.5));
+}
+
+/* Central Floating Dock / Dermaga Tengah */
+.center-deck {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: repeating-linear-gradient(
+    90deg,
+    #78350f,
+    #78350f 14px,
+    #582506 14px,
+    #582506 17px
+  );
+  border: 3px solid #d97706;
+  border-radius: 20px;
+  padding: 8px 18px;
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 2px #451a03;
+  z-index: 25;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 260px;
+  animation: floatDeck 5s ease-in-out infinite;
+}
+
+@keyframes floatDeck {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  50% { transform: translate(-50%, -54%) rotate(-0.5deg); }
+}
+
+.center-deck-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fef3c7;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* ================= AVATAR TOKENS ================= */
+.player-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-weight: 900;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 2.5px #38bdf8;
+  animation: hopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s ease;
+}
+
+.player-token .avatar-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.player-token.splashing-in-water {
+  animation: swimBobbing 1s infinite alternate !important;
+  background: #bae6fd !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 4px 8px rgba(2, 132, 199, 0.4) !important;
+}
+
+@keyframes swimBobbing {
+  0% { transform: translateY(0px) rotate(-4deg); }
+  100% { transform: translateY(8px) rotate(4deg); }
+}
+
+/* ================= DRAMATIC SINKING & SURVIVOR ANIMATION ================= */
+.island.sinking {
+  animation: sinkAndSplash 1.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+  pointer-events: none;
+}
+
+.island.survivor {
+  animation: victoryGlow 1.2s infinite alternate;
+  box-shadow: 
+    0 0 50px #fef08a,
+    0 0 90px rgba(254, 240, 138, 0.5),
+    0 25px 45px rgba(0,0,0,0.5);
+  border-color: #fef08a !important;
+  z-index: 20;
+}
+
+@keyframes sinkAndSplash {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  15% {
+    transform: scale(1.02) rotate(3deg);
+  }
+  30% {
+    transform: scale(0.98) rotate(-4deg);
+  }
+  100% {
+    transform: scale(0.5) translateY(180px);
+    opacity: 0.1;
+    filter: blur(8px);
+  }
+}
+
+@keyframes victoryGlow {
+  0% { transform: scale(1.02); }
+  100% { transform: scale(1.06); }
+}
+
+@keyframes hopIn {
+  0% { transform: scale(0) translateY(-30px); }
+  70% { transform: scale(1.2) translateY(6px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes floatTitle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulseHurry {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+/* ================= STUDENT MOBILE CONTROLLER SCREEN ================= */
+.mobile-wrapper {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+}
+
+.player-status-bar {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18), 0 0 0 3px #bae6fd;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.student-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+  margin: 12px 0;
+  min-height: 400px;
+}
+
+/* 3D Big Chunky Touch Buttons for Kids */
+.island-btn {
+  border-radius: 32px;
+  border: 4px solid #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 16px 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.island-btn:active {
+  transform: translateY(6px) scale(0.97);
+}
+
+.island-btn.selected {
+  border-color: #fef08a !important;
+  transform: scale(0.96);
+  box-shadow: 
+    0 0 30px #fef08a,
+    0 4px 0 rgba(0,0,0,0.3) !important;
+}
+
+.island-btn.selected::before {
+  content: '✓ DIPILIH';
+  position: absolute;
+  top: 8px;
+  background: #fef08a;
+  color: #78350f;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  letter-spacing: 1px;
+}
+
+.island-btn-a {
+  background: linear-gradient(180deg, #fb7185 0%, #e11d48 50%, #9f1239 100%);
+  box-shadow: 0 8px 0 #881337, 0 14px 24px rgba(225, 29, 72, 0.4);
+}
+.island-btn-a:active { box-shadow: 0 2px 0 #881337; }
+
+.island-btn-b {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%);
+  box-shadow: 0 8px 0 #075985, 0 14px 24px rgba(2, 132, 199, 0.4);
+}
+.island-btn-b:active { box-shadow: 0 2px 0 #075985; }
+
+.island-btn-c {
+  background: linear-gradient(180deg, #fde047 0%, #d97706 50%, #92400e 100%);
+  box-shadow: 0 8px 0 #78350f, 0 14px 24px rgba(217, 119, 6, 0.4);
+}
+.island-btn-c:active { box-shadow: 0 2px 0 #78350f; }
+
+.island-btn-d {
+  background: linear-gradient(180deg, #4ade80 0%, #16a34a 50%, #14532d 100%);
+  box-shadow: 0 8px 0 #14532d, 0 14px 24px rgba(22, 163, 74, 0.4);
+}
+.island-btn-d:active { box-shadow: 0 2px 0 #14532d; }
+
+.island-btn-icon {
+  font-size: 3.2rem;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+}
+
+.island-btn-label {
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.island-btn-desc {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-top: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  max-width: 95%;
+  word-break: break-word;
+}
+
+/* Avatar Selection Grid */
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.avatar-choice {
+  font-size: 2.2rem;
+  padding: 10px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  border: 3.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+}
+
+.avatar-choice:hover {
+  transform: scale(1.1);
+}
+
+.avatar-choice.active {
+  border-color: #0284c7;
+  background: #e0f2fe;
+  transform: scale(1.18);
+  box-shadow: 0 8px 16px rgba(2, 132, 199, 0.3);
+}
+
+/* Floating Status Banners on Sinking / Survivor */
+.status-floating-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 900;
+  font-size: 1.6rem;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+  z-index: 30;
+  pointer-events: none;
+  animation: bannerPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.survivor-banner {
+  background: linear-gradient(180deg, #fef08a 0%, #facc15 100%);
+  color: #78350f;
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 35px #fef08a, 0 12px 25px rgba(0,0,0,0.3);
+}
+
+.splash-banner {
+  background: linear-gradient(180deg, #e0f2fe 0%, #38bdf8 100%);
+  color: #0369a1;
+  border: 4px solid #ffffff;
+}
+
+@keyframes bannerPop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  70% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 32px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  border: 5px solid #bae6fd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .question-text { font-size: 1.4rem; }
+  .island-answer-text { font-size: 1.2rem; }
+  .island-btn-icon { font-size: 2.4rem; }
+  .island-badge { font-size: 1.1rem; padding: 4px 12px; }
+}

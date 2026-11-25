@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulau Apung: Jangan Jatuh! - Game Edukasi SD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="water-waves"></div>
+
+  <div class="landing-container">
+    <div style="font-size: 4rem; margin-bottom: 8px;">🏝️</div>
+    <h1 class="game-logo">PULAU APUNG</h1>
+    <div class="game-subtitle">Game Kuis Edukasi Multiplayer untuk Siswa SD Kelas 1–3</div>
+
+    <div class="role-cards">
+      <!-- Kartu Guru / Host Proyektor -->
+      <div class="role-card">
+        <div class="role-icon">🖥️</div>
+        <div class="role-title">Layar Guru (Proyektor)</div>
+        <div class="role-desc">
+          Buka di laptop guru untuk ditampilkan di proyektor depan kelas. Membuat Room, menampilkan pulau apung 3D, animasi karakter, dan mengatur soal kuis.
+        </div>
+        <a href="/host.html" class="btn-fun btn-blue" style="width: 100%;">
+          Buka Layar Proyektor 🚀
+        </a>
+      </div>
+
+      <!-- Kartu Siswa / Controller HP -->
+      <div class="role-card">
+        <div class="role-icon">📱</div>
+        <div class="role-title">Layar Siswa (HP / Tablet)</div>
+        <div class="role-desc">
+          Buka di HP atau tablet siswa. Siswa memasukkan kode PIN 4 digit untuk mengontrol karakter hewan mereka dan memilih pulau yang aman.
+        </div>
+        <a href="/play.html" class="btn-fun btn-green" style="width: 100%;">
+          Gabung sebagai Siswa 🎮
+        </a>
+      </div>
+    </div>
+
+    <!-- Server LAN Info Box -->
+    <div style="margin-top: 32px; background: rgba(255,255,255,0.9); padding: 14px 24px; border-radius: 9999px; font-weight: 700; color: #0369a1; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" id="lan-info">
+      Memeriksa alamat jaringan lokal...
+    </div>
+  </div>
+
+  <script>
+    fetch('/api/server-info')
+      .then(res => res.json())
+      .then(data => {
+        const infoEl = document.getElementById('lan-info');
+        if (data.primaryIP) {
+          infoEl.innerHTML = `🌐 Alamat HP Siswa di WiFi: <strong>http://${data.primaryIP}:${data.port}/play.html</strong>`;
+        }
+      })
+      .catch(() => {
+        document.getElementById('lan-info').innerHTML = '🌐 Pastikan terhubung ke jaringan WiFi yang sama.';
+      });
+  </script>
+</body>
+</html>
